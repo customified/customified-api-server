@@ -2,6 +2,7 @@ import mongoose, { Schema, Document } from 'mongoose';
 import { IUpgrade } from './Upgrade';
 
 export interface IOrder extends Document {
+  _id: string;
   storeId: string;
   isPaid: boolean;
   username: string;
@@ -9,6 +10,7 @@ export interface IOrder extends Document {
   address: string;
   phone: string;
   status: string;
+  createdAt : string;
   orderItems: Array<{
     product: {
       id: string;
@@ -35,6 +37,7 @@ export interface IOrder extends Document {
     }
     }
   }>;
+
 }
 
 const DesignSchema = new Schema({
