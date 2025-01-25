@@ -79,7 +79,7 @@ const ImageUpload: React.FC<ImageUploadProps> = ({
       </div>
       <CldUploadWidget 
         onSuccess={onUpload} 
-        uploadPreset="kylfnsll"
+        uploadPreset={process.env.NEXT_PUBLIC_CLOUDINARY_UPLOAD_PRESET}
         options={{ multiple: multiple }}
       >
         {({ open }) => {

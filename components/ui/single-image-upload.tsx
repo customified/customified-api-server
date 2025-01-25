@@ -68,7 +68,7 @@ const SingleImageUpload: React.FC<ImageUploadProps> = ({
                     </div>
                 ))}
             </div>
-            <CldUploadWidget uploadPreset="kylfnsll"
+            <CldUploadWidget uploadPreset={process.env.NEXT_PUBLIC_CLOUDINARY_UPLOAD_PRESET}
             onSuccess={(results) => {
                 if(results.info){
                     const info = results.info as CloudinaryUploadWidgetInfo;
