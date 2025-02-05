@@ -20,6 +20,7 @@ export interface IProduct {
     industries?: IIndustry[];
     additionalCategories?: string[];
     name: string;
+    slug: string;
     isFeatured: boolean;
     isArchived: boolean;
     customizations: ICustomization[];
@@ -56,6 +57,11 @@ const ProductSchema = new mongoose.Schema({
     name: {
         type: String,
         required: true
+    },
+    slug: {
+        type: String,
+        required: true,
+        unique: true
     },
     isFeatured: {
         type: Boolean,
@@ -97,5 +103,12 @@ const ProductSchema = new mongoose.Schema({
     timestamps: true
 });
 
+// Pre-save hook to generate slug from name
+ProductSchema.pre('save', function(next) {
+    if (this.name) {
+        this.slug = this.name.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
+    }
+    next();
+});
 
 export const Product = mongoose.models?.Product || mongoose.model('Product', ProductSchema);

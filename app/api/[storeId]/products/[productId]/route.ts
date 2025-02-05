@@ -18,7 +18,7 @@ export async function GET(
         await dbConnect()
 
         const product = await Product.findOne({
-            _id: params.productId
+            slug: params.productId
         }).populate('category').populate('customizations').populate('industries').populate('additionalCategories').populate('upgrades').populate('deliveryCosts')
 
         return NextResponse.json(product,{
