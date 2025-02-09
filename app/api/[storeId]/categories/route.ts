@@ -80,7 +80,7 @@ export async function GET(
 
     const categories = await Category.find({
         storeId: params.storeId
-    }).populate('billboardId')
+    }).sort({'weight': -1}).populate('billboardId')
 
     return NextResponse.json(categories)
 
