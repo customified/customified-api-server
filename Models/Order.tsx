@@ -23,6 +23,7 @@ export interface IOrder extends Document {
       upgrades: { [key: string]: IUpgrade };
       unitCost: number | string;
       totalCost: number;
+      orderNote: string;
       design?: {
         front: {
             userdesign : string | null;
@@ -73,7 +74,8 @@ const OrderSchema: Schema = new Schema({
       design: {
         front: { type: DesignSchema, default: null },
         back: { type: DesignSchema, default: null }
-      }
+      },
+      orderNote: { type: String, default: null },
     }
   }]
 },

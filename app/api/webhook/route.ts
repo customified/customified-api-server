@@ -72,6 +72,7 @@ export async function POST(req: Request) {
           unitCost: cartItem.unitCost,
           totalCost: cartItem.totalCost,
           design: cartItem.design,
+          orderNote: cartItem.orderNote,
         },
       })),
       address: addressString,
