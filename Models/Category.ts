@@ -9,6 +9,8 @@ export interface category {
     billboardId: string;
     name: string;
     image: string;
+    product_description?: { key: string; value: string }[];
+    faq?: { key: string; value: string }[];
 }
 
 const CategorySchema = new mongoose.Schema({
@@ -34,7 +36,15 @@ const CategorySchema = new mongoose.Schema({
     image:{
         type: String,
         required: true
-    }
+    },
+    product_description: [{
+        key: { type: String },
+        value: { type: String }
+    }],
+    faq: [{
+        key: { type: String },
+        value: { type: String }
+    }]
 
 },
     {
