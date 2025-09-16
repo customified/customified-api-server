@@ -19,7 +19,7 @@ import axios from 'axios';
 import { Trash } from 'lucide-react';
 import { useParams, useRouter } from 'next/navigation';
 import React, { useState, useEffect, useId } from 'react';
-import { useForm } from 'react-hook-form';
+import { useForm, useFieldArray } from 'react-hook-form';
 import { toast } from 'react-hot-toast';
 import { IProduct } from '@/Models/Product';
 import ImageUpload from '@/components/ui/image-upload';
@@ -94,7 +94,15 @@ const formSchema = z.object({
     ),
     stock: z.number().min(0),
     deliveryCostId: z.string().min(1),
-    rating: z.number().min(0).max(5).optional()
+    rating: z.number().min(0).max(5).optional(),
+    tags: z
+        .array(
+            z.object({
+                icon_url: z.string().min(1),
+                value: z.string().min(1)
+            })
+        )
+        .optional()
 });
 
 type ProductFormValues = z.infer<typeof formSchema>
@@ -133,8 +141,14 @@ export const ProductForm: React.FC<ProductFormProps> = ({
             upgrades: [],
             stock: 0,
             deliveryCostId: '',
-            rating: 0
+            rating: 0,
+            tags: []
         }
+    });
+
+    const { fields: tagFields, append: appendTag, remove: removeTag } = useFieldArray({
+        control: form.control,
+        name: 'tags'
     });
 
     const onSubmit = async (data: ProductFormValues) => {
@@ -501,6 +515,49 @@ export const ProductForm: React.FC<ProductFormProps> = ({
                                 </FormItem>
                             )}
                         />
+
+                        {/* Tags */}
+                        <div className='col-span-3'>
+                            <div className='flex items-center justify-between'>
+                                <FormLabel>Tags</FormLabel>
+                                <Button type='button' variant='secondary' disabled={loading} onClick={() => appendTag({ icon_url: '', value: '' })}>Add Tag</Button>
+                            </div>
+                            <div className='mt-2 space-y-4'>
+                                {tagFields.map((field, index) => (
+                                    <div key={field.id} className='grid grid-cols-3 gap-4 items-end'>
+                                        <FormField
+                                            control={form.control}
+                                            name={`tags.${index}.icon_url` as const}
+                                            render={({ field }) => (
+                                                <FormItem>
+                                                    <FormLabel>Icon URL</FormLabel>
+                                                    <FormControl>
+                                                        <Input disabled={loading} placeholder='https://...' {...field} />
+                                                    </FormControl>
+                                                    <FormMessage />
+                                                </FormItem>
+                                            )}
+                                        />
+                                        <FormField
+                                            control={form.control}
+                                            name={`tags.${index}.value` as const}
+                                            render={({ field }) => (
+                                                <FormItem>
+                                                    <FormLabel>Value</FormLabel>
+                                                    <FormControl>
+                                                        <Input disabled={loading} placeholder='e.g. Eco-friendly' {...field} />
+                                                    </FormControl>
+                                                    <FormMessage />
+                                                </FormItem>
+                                            )}
+                                        />
+                                        <div className='flex'>
+                                            <Button type='button' variant='destructive' size='sm' disabled={loading} onClick={() => removeTag(index)}>Remove</Button>
+                                        </div>
+                                    </div>
+                                ))}
+                            </div>
+                        </div>
 
                     </div>
                     <Button disabled={loading} type="submit">{action}</Button>

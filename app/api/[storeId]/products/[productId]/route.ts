@@ -47,7 +47,7 @@ export async function PATCH(
 
         const body = await req.json()
 
-        const { name, categoryId, description ,industries, additionalCategories, isFeatured, isArchived, customizations, images, upgrades, stock, deliveryCostId, rating } = body
+        const { name, categoryId, description ,industries, additionalCategories, isFeatured, isArchived, customizations, images, upgrades, stock, deliveryCostId, rating, tags } = body
 
         if (!user) {
             return new NextResponse("Unauthenticated", { status: 401 })
@@ -105,6 +105,21 @@ export async function PATCH(
             }
         }
 
+        // Validate tags if provided
+        if (tags !== undefined) {
+            if (!Array.isArray(tags)) {
+                return new NextResponse("tags must be an array", { status: 400 })
+            }
+            for (const t of tags) {
+                if (!t || typeof t !== 'object') {
+                    return new NextResponse("each tag must be an object", { status: 400 })
+                }
+                if (typeof t.icon_url !== 'string' || typeof t.value !== 'string') {
+                    return new NextResponse("each tag must have icon_url and value strings", { status: 400 })
+                }
+            }
+        }
+
         const product = await Product.updateMany({
             _id: params.productId
         },
@@ -122,7 +137,8 @@ export async function PATCH(
                     images: images,
                     stock: stock,
                     deliveryCosts: deliveryCostId,
-                    ...(rating !== undefined ? { rating: Number(rating) } : {})
+                    ...(rating !== undefined ? { rating: Number(rating) } : {}),
+                    ...(tags !== undefined ? { tags } : {})
                 }
             }
         )

@@ -41,6 +41,7 @@ const ProductsPage = async ({
     upgrades: item.upgrades,
     stock: item.stock,
     rating: item.rating,
+    tags: item.tags,
     deliveryCosts: item.deliveryCosts,
     createdAt: format(item.createdAt, "MMMM do, yyyy")
   }));

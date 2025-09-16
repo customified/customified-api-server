@@ -28,6 +28,7 @@ export interface IProduct {
     upgrades: IUpgrade[];
     stock: number;
     rating?: number;
+    tags?: { icon_url: string; value: string }[];
     deliveryCosts: IDeliveryCost;
     createdAt: string;
     storeId: string;
@@ -96,6 +97,10 @@ const ProductSchema = new mongoose.Schema({
         max: 5,
         default: 0
     },
+    tags: [{
+        icon_url: { type: String },
+        value: { type: String }
+    }],
     deliveryCosts: {
         type: String,
         ref: DeliveryCost,
