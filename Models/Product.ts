@@ -27,6 +27,7 @@ export interface IProduct {
     images: string[];  
     upgrades: IUpgrade[];
     stock: number;
+    rating?: number;
     deliveryCosts: IDeliveryCost;
     createdAt: string;
     storeId: string;
@@ -87,6 +88,12 @@ const ProductSchema = new mongoose.Schema({
     stock: {
         type: Number,
         required: true,
+        default: 0
+    },
+    rating: {
+        type: Number,
+        min: 0,
+        max: 5,
         default: 0
     },
     deliveryCosts: {

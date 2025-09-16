@@ -21,6 +21,7 @@ export type ProductColumn = {
   images: string[]
   upgrades: IUpgrade[]
   stock: number
+  rating?: number
   deliveryCosts: IDeliveryCost
   createdAt: string
 }
@@ -93,6 +94,11 @@ export const columns: ColumnDef<ProductColumn>[] = [
     accessorKey: "stock",
     header: "Stock",
     cell: ({ row }) => row.original.stock
+  },
+  {
+    accessorKey: "rating",
+    header: "Rating",
+    cell: ({ row }) => row.original.rating ?? 0
   },
   {
     accessorKey: "createdAt",

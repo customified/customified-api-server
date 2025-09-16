@@ -93,7 +93,8 @@ const formSchema = z.object({
         })
     ),
     stock: z.number().min(0),
-    deliveryCostId: z.string().min(1)
+    deliveryCostId: z.string().min(1),
+    rating: z.number().min(0).max(5).optional()
 });
 
 type ProductFormValues = z.infer<typeof formSchema>
@@ -131,7 +132,8 @@ export const ProductForm: React.FC<ProductFormProps> = ({
             images: [],
             upgrades: [],
             stock: 0,
-            deliveryCostId: ''
+            deliveryCostId: '',
+            rating: 0
         }
     });
 
@@ -447,6 +449,29 @@ export const ProductForm: React.FC<ProductFormProps> = ({
                                             type='number'
                                             disabled={loading}
                                             placeholder='Stock'
+                                            {...field}
+                                            onChange={(e) => field.onChange(Number(e.target.value))}
+                                        />
+                                    </FormControl>
+                                    <FormMessage />
+                                </FormItem>
+                            )}
+                        />
+
+                        <FormField
+                            control={form.control}
+                            name='rating'
+                            render={({ field }) => (
+                                <FormItem>
+                                    <FormLabel>Rating (0-5)</FormLabel>
+                                    <FormControl>
+                                        <Input
+                                            type='number'
+                                            step='0.1'
+                                            min={0}
+                                            max={5}
+                                            disabled={loading}
+                                            placeholder='Rating'
                                             {...field}
                                             onChange={(e) => field.onChange(Number(e.target.value))}
                                         />
