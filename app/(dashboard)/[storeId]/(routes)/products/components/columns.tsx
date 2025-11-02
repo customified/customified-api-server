@@ -21,6 +21,8 @@ export type ProductColumn = {
   images: string[]
   upgrades: IUpgrade[]
   stock: number
+  rating?: number
+  tags?: { icon_url: string; value: string }[]
   deliveryCosts: IDeliveryCost
   createdAt: string
 }
@@ -93,6 +95,22 @@ export const columns: ColumnDef<ProductColumn>[] = [
     accessorKey: "stock",
     header: "Stock",
     cell: ({ row }) => row.original.stock
+  },
+  {
+    accessorKey: "rating",
+    header: "Rating",
+    cell: ({ row }) => row.original.rating ?? 0
+  },
+  {
+    accessorKey: "tags",
+    header: "Tags",
+    cell: ({ row }) => (
+      <ul className="flex gap-2 flex-wrap">
+        {row.original.tags?.map((t) => (
+          <li key={`${t.icon_url}-${t.value}`}>[{t.value}]</li>
+        ))}
+      </ul>
+    )
   },
   {
     accessorKey: "createdAt",

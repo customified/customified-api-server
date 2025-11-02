@@ -15,7 +15,7 @@ import axios from 'axios'
 import { Trash } from 'lucide-react'
 import { useParams, useRouter } from 'next/navigation'
 import React, { useState } from 'react'
-import { useForm } from 'react-hook-form'
+import { useFieldArray, useForm } from 'react-hook-form'
 import { toast } from 'react-hot-toast'
 
 import * as z from 'zod'
@@ -29,7 +29,9 @@ interface CategoryFormProps {
 const formSchema = z.object({
     name: z.string().min(1),
     image: z.string().min(1),
-    billboardId: z.string().min(1)
+    billboardId: z.string().min(1),
+    product_description: z.array(z.object({ key: z.string().min(1), value: z.string().min(1) })).optional(),
+    faq: z.array(z.object({ key: z.string().min(1), value: z.string().min(1) })).optional()
 })
 
 type CategoryFormValues = z.infer<typeof formSchema>
@@ -55,9 +57,14 @@ export const CategoryForm: React.FC<CategoryFormProps> = ({
         defaultValues: initialData || {
             name: '',
             image: '',
-            billboardId: ''
+            billboardId: '',
+            product_description: [],
+            faq: []
         }
     });
+
+    const { fields: productDescFields, append: appendProductDesc, remove: removeProductDesc } = useFieldArray({ control: form.control, name: 'product_description' })
+    const { fields: faqFields, append: appendFaq, remove: removeFaq } = useFieldArray({ control: form.control, name: 'faq' })
 
     const onSubmit = async (data: CategoryFormValues) => {
         try {
@@ -191,6 +198,92 @@ export const CategoryForm: React.FC<CategoryFormProps> = ({
                                 </FormItem>
                             )}
                         />
+                        
+                        {/* Product Description Items */}
+                        <div className="col-span-3">
+                            <div className='flex items-center justify-between'>
+                                <FormLabel>Product Description</FormLabel>
+                                <Button type='button' variant='secondary' disabled={loading} onClick={() => appendProductDesc({ key: '', value: '' })}>Add Description Item</Button>
+                            </div>
+                            <div className='mt-2 space-y-4'>
+                                {productDescFields.map((field, index) => (
+                                    <div key={field.id} className='grid grid-cols-3 gap-4 items-end'>
+                                        <FormField
+                                            control={form.control}
+                                            name={`product_description.${index}.key` as const}
+                                            render={({ field }) => (
+                                                <FormItem>
+                                                    <FormLabel>Key</FormLabel>
+                                                    <FormControl>
+                                                        <Input disabled={loading} placeholder='Key' {...field} />
+                                                    </FormControl>
+                                                    <FormMessage />
+                                                </FormItem>
+                                            )}
+                                        />
+                                        <FormField
+                                            control={form.control}
+                                            name={`product_description.${index}.value` as const}
+                                            render={({ field }) => (
+                                                <FormItem>
+                                                    <FormLabel>Value</FormLabel>
+                                                    <FormControl>
+                                                        <Input disabled={loading} placeholder='Value' {...field} />
+                                                    </FormControl>
+                                                    <FormMessage />
+                                                </FormItem>
+                                            )}
+                                        />
+                                        <div className='flex'>
+                                            <Button type='button' variant='destructive' size='sm' disabled={loading} onClick={() => removeProductDesc(index)}>Remove</Button>
+                                        </div>
+                                    </div>
+                                ))}
+                            </div>
+                        </div>
+
+                        {/* FAQ Items */}
+                        <div className="col-span-3">
+                            <div className='flex items-center justify-between'>
+                                <FormLabel>FAQ</FormLabel>
+                                <Button type='button' variant='secondary' disabled={loading} onClick={() => appendFaq({ key: '', value: '' })}>Add FAQ</Button>
+                            </div>
+                            <div className='mt-2 space-y-4'>
+                                {faqFields.map((field, index) => (
+                                    <div key={field.id} className='grid grid-cols-3 gap-4 items-end'>
+                                        <FormField
+                                            control={form.control}
+                                            name={`faq.${index}.key` as const}
+                                            render={({ field }) => (
+                                                <FormItem>
+                                                    <FormLabel>Question</FormLabel>
+                                                    <FormControl>
+                                                        <Input disabled={loading} placeholder='Question' {...field} />
+                                                    </FormControl>
+                                                    <FormMessage />
+                                                </FormItem>
+                                            )}
+                                        />
+                                        <FormField
+                                            control={form.control}
+                                            name={`faq.${index}.value` as const}
+                                            render={({ field }) => (
+                                                <FormItem>
+                                                    <FormLabel>Answer</FormLabel>
+                                                    <FormControl>
+                                                        <Input disabled={loading} placeholder='Answer' {...field} />
+                                                    </FormControl>
+                                                    <FormMessage />
+                                                </FormItem>
+                                            )}
+                                        />
+                                        <div className='flex'>
+                                            <Button type='button' variant='destructive' size='sm' disabled={loading} onClick={() => removeFaq(index)}>Remove</Button>
+                                        </div>
+                                    </div>
+                                ))}
+                            </div>
+                        </div>
                     </div>
                     <Button disabled={loading} className='ml-auto' type='submit'>
                         {action}

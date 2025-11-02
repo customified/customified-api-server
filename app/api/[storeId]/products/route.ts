@@ -32,7 +32,9 @@ export async function POST(
         images,
         upgrades,
         stock,
-        deliveryCostId
+        deliveryCostId,
+        rating,
+        tags
     } = body;
     
 
@@ -80,6 +82,29 @@ export async function POST(
         return new NextResponse("Unauthorized", {status: 403})
     }
 
+    // Validate rating if provided
+    if (rating !== undefined) {
+        const numericRating = Number(rating)
+        if (Number.isNaN(numericRating) || numericRating < 0 || numericRating > 5) {
+            return new NextResponse("rating must be a number between 0 and 5", {status: 400})
+        }
+    }
+
+    // Validate tags if provided
+    if (tags !== undefined) {
+        if (!Array.isArray(tags)) {
+            return new NextResponse("tags must be an array", { status: 400 })
+        }
+        for (const t of tags) {
+            if (!t || typeof t !== 'object') {
+                return new NextResponse("each tag must be an object", { status: 400 })
+            }
+            if (typeof t.icon_url !== 'string' || typeof t.value !== 'string') {
+                return new NextResponse("each tag must have icon_url and value strings", { status: 400 })
+            }
+        }
+    }
+
     const product = await Product.create({
         name,
         category: categoryId,
@@ -93,6 +118,8 @@ export async function POST(
         images,
         stock,
         deliveryCosts: deliveryCostId,
+        ...(rating !== undefined ? { rating: Number(rating) } : {}),
+        ...(tags !== undefined ? { tags } : {}),
         storeId: params.storeId
     })
 

@@ -47,7 +47,7 @@ export async function PATCH(
 
         const body = await req.json()
 
-        const { name, categoryId, description ,industries, additionalCategories, isFeatured, isArchived, customizations, images, upgrades, stock, deliveryCostId } = body
+        const { name, categoryId, description ,industries, additionalCategories, isFeatured, isArchived, customizations, images, upgrades, stock, deliveryCostId, rating, tags } = body
 
         if (!user) {
             return new NextResponse("Unauthenticated", { status: 401 })
@@ -97,6 +97,29 @@ export async function PATCH(
             return new NextResponse("Unauthorized", { status: 403 })
         }
 
+        // Validate rating if provided
+        if (rating !== undefined) {
+            const numericRating = Number(rating)
+            if (Number.isNaN(numericRating) || numericRating < 0 || numericRating > 5) {
+                return new NextResponse("rating must be a number between 0 and 5", { status: 400 })
+            }
+        }
+
+        // Validate tags if provided
+        if (tags !== undefined) {
+            if (!Array.isArray(tags)) {
+                return new NextResponse("tags must be an array", { status: 400 })
+            }
+            for (const t of tags) {
+                if (!t || typeof t !== 'object') {
+                    return new NextResponse("each tag must be an object", { status: 400 })
+                }
+                if (typeof t.icon_url !== 'string' || typeof t.value !== 'string') {
+                    return new NextResponse("each tag must have icon_url and value strings", { status: 400 })
+                }
+            }
+        }
+
         const product = await Product.updateMany({
             _id: params.productId
         },
@@ -113,7 +136,9 @@ export async function PATCH(
                     upgrades: upgrades,
                     images: images,
                     stock: stock,
-                    deliveryCosts: deliveryCostId
+                    deliveryCosts: deliveryCostId,
+                    ...(rating !== undefined ? { rating: Number(rating) } : {}),
+                    ...(tags !== undefined ? { tags } : {})
                 }
             }
         )

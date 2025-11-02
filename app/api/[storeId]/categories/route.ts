@@ -17,7 +17,7 @@ export async function POST(
 
     const body= await req.json()
 
-    const { name, billboardId , image} = body
+    const { name, billboardId , image, product_description, faq } = body
      
     if(!user){
         return new NextResponse("Unauthenticated", {status: 401})
@@ -50,11 +50,42 @@ export async function POST(
         return new NextResponse("Unauthorized", {status: 403})
     }
 
+    // Validate arrays if provided
+    if (product_description !== undefined) {
+        if (!Array.isArray(product_description)) {
+            return new NextResponse("product_description must be an array", { status: 400 })
+        }
+        for (const item of product_description) {
+            if (!item || typeof item !== 'object') {
+                return new NextResponse("each product_description item must be an object", { status: 400 })
+            }
+            if (typeof item.key !== 'string' || typeof item.value !== 'string') {
+                return new NextResponse("each product_description item must have key and value strings", { status: 400 })
+            }
+        }
+    }
+
+    if (faq !== undefined) {
+        if (!Array.isArray(faq)) {
+            return new NextResponse("faq must be an array", { status: 400 })
+        }
+        for (const item of faq) {
+            if (!item || typeof item !== 'object') {
+                return new NextResponse("each faq item must be an object", { status: 400 })
+            }
+            if (typeof item.key !== 'string' || typeof item.value !== 'string') {
+                return new NextResponse("each faq item must have key and value strings", { status: 400 })
+            }
+        }
+    }
+
     const category = await Category.create({
         name: name,
         billboardId: billboardId,
         storeId: params.storeId,
-        image: image
+        image: image,
+        ...(product_description !== undefined ? { product_description } : {}),
+        ...(faq !== undefined ? { faq } : {})
     })
 
     return NextResponse.json(category)
