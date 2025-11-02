@@ -11,18 +11,19 @@ const CategoryPage =async ({
     }) => {
 
     await dbConnect()
-    const category = await Category.findOne({
+    const categoryDoc = await Category.findOne({
         _id: params.categoryId
     })
 
-    const billboards = await Billboard.find({
+    const billboardDocs = await Billboard.find({
       storeId: params.storeId
     })
 
-    console.log(category, billboards)
+    // ✅ Convert to plain objects
+    const category = categoryDoc ? categoryDoc.toObject() : null;
+    const billboards = billboardDocs.map(doc => doc.toObject());
 
-  return (
-    <div className="flex-col">
+  return (<div className="flex-col">
         <div className="flex-1 space-y-4 p-8 pt-6">
         <CategoryForm billboards={billboards} initialData={category}/>
         </div>
